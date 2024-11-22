@@ -5,7 +5,7 @@ from api_trt.logger import logger
 
 
 class Configs(object):
-    def __init__(self, models_dir: str = '/models'):
+    def __init__(self, models_dir: str = '../models'):
         self.models_dir = self.__get_param('MODELS_DIR', models_dir)
         self.onnx_models_dir = os.path.join(self.models_dir, 'onnx')
         self.trt_engines_dir = os.path.join(self.models_dir, 'trt-engines')
@@ -33,6 +33,7 @@ class Configs(object):
             raise e
 
     def __get_param(self, ENV, default=None):
+        print(f"env is {os.environ.get(ENV, default)}")
         return os.environ.get(ENV, default)
 
     def build_model_paths(self, model_name: str, ext: str):

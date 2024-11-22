@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+source ../compose/cpu.env
 echo Preparing models...
 python -m api_trt.prepare_models
 

@@ -72,39 +72,39 @@ det_thresh=0.6
 mkdir -p models
 
 
-docker build -t $IMAGE:$TAG -f src/Dockerfile_cpu src/.
+#docker build -t $IMAGE:$TAG -f src/Dockerfile_cpu src/.
 
 echo "Starting $n_workers workers on CPU";
 
 
 name=$IMAGE-cpu;
 
-docker rm -f $name;
+#docker rm -f $name;
 echo --- Starting container $name  with CPU  at port $START_PORT;
 
-docker run  -p $START_PORT:18080\
-    -d\
-    -e LOG_LEVEL=$log_level\
-    -e PYTHONUNBUFFERED=0\
-    -e PORT=18080\
-    -e NUM_WORKERS=$n_workers\
-    -e INFERENCE_BACKEND=onnx\
-    -e DET_NAME=$det_model\
-    -e DET_THRESH=$det_thresh\
-    -e REC_NAME=$rec_model\
-    -e MASK_DETECTOR=$mask_detector\
-    -e GA_NAME=$ga_model\
-    -e KEEP_ALL=True\
-    -e MAX_SIZE=$max_size\
-    -e DEF_RETURN_FACE_DATA=$return_face_data\
-    -e DEF_EXTRACT_EMBEDDING=$extract_embeddings\
-    -e DEF_EXTRACT_GA=$detect_ga\
-    -v $PWD/models:/models\
-    -v $PWD/src:/app\
-    --health-cmd='curl -f http://localhost:18080/info || exit 1'\
-    --health-interval=1m\
-    --health-timeout=10s\
-    --health-retries=3\
-    --name=$name\
-    $IMAGE:$TAG
+#docker run  -p $START_PORT:18080\
+#    -d\
+#    -e LOG_LEVEL=$log_level\
+#    -e PYTHONUNBUFFERED=0\
+#    -e PORT=18080\
+#    -e NUM_WORKERS=$n_workers\
+#    -e INFERENCE_BACKEND=onnx\
+#    -e DET_NAME=$det_model\
+#    -e DET_THRESH=$det_thresh\
+#    -e REC_NAME=$rec_model\
+#    -e MASK_DETECTOR=$mask_detector\
+#    -e GA_NAME=$ga_model\
+#    -e KEEP_ALL=True\
+#    -e MAX_SIZE=$max_size\
+#    -e DEF_RETURN_FACE_DATA=$return_face_data\
+#    -e DEF_EXTRACT_EMBEDDING=$extract_embeddings\
+#    -e DEF_EXTRACT_GA=$detect_ga\
+#    -v $PWD/models:/models\
+#    -v $PWD/src:/app\
+#    --health-cmd='curl -f http://localhost:18080/info || exit 1'\
+#    --health-interval=1m\
+#    --health-timeout=10s\
+#    --health-retries=3\
+#    --name=$name\
+#    $IMAGE:$TAG
 
