@@ -39,6 +39,8 @@ async def lifespan(_: FastAPI):
     """
 
     logger.info(f"Starting processing module...")
+    skip_model_init = os.getenv('SKIP_MODEL_INIT', 'false').lower() in ('true', '1', 'yes')
+    
     try:
         timeout = ClientTimeout(total=60.)
         if settings.defaults.sslv3_hack:
@@ -48,11 +50,18 @@ async def lifespan(_: FastAPI):
         else:
             dl_client = aiohttp.ClientSession(timeout=timeout, connector=TCPConnector(ssl=False))
         processing = await get_processing()
-        await processing.start(dl_client=dl_client)
-        logger.info(f"Processing module ready!")
+        
+        if not skip_model_init:
+            await processing.start(dl_client=dl_client)
+            logger.info(f"Processing module ready!")
+        else:
+            logger.info(f"Skipping model initialization (SKIP_MODEL_INIT=true)")
     except Exception as e:
-        logger.error(e)
-        exit(1)
+        if not skip_model_init:
+            logger.error(e)
+            exit(1)
+        else:
+            logger.warning(f"Model initialization failed, but continuing (SKIP_MODEL_INIT=true): {e}")
     yield
 
 

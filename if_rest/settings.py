@@ -1,4 +1,9 @@
 from typing import Union, Optional, List
+import os
+
+# 禁用 Numba 缓存以避免 multiprocessing 兼容性问题
+os.environ['NUMBA_CACHE_DIR'] = '/tmp/numba_cache'
+os.environ['NUMBA_DISABLE_JIT'] = '0'  # 保持 JIT 启用以获得性能
 
 from pydantic.v1.env_settings import BaseSettings
 from pydantic.v1.validators import str_validator

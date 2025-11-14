@@ -5,7 +5,16 @@ from if_rest.logger import logger
 
 
 class Configs(object):
-    def __init__(self, models_dir: str = '/models'):
+    def __init__(self, models_dir: str = None):
+        # Default to project-relative path for local development, /models for Docker
+        if models_dir is None:
+            # Try project-relative path first (local development)
+            project_models = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'models')
+            if os.path.exists(project_models):
+                models_dir = project_models
+            else:
+                # Fall back to Docker default
+                models_dir = '/models'
         self.models_dir = self.__get_param('MODELS_DIR', models_dir)
         self.onnx_models_dir = os.path.join(self.models_dir, 'onnx')
         self.trt_engines_dir = os.path.join(self.models_dir, 'trt-engines')
