@@ -23,75 +23,76 @@ arcface_src = np.expand_dims(arcface_src, axis=0)
 
 
 @nb.njit(cache=True, fastmath=True)
-def np_apply_along_axis(func1d, axis, arr):
-    """
-    Applies a function along an axis of a 2D array.
-
-    Args:
-        func1d: A function that takes a 1D array as input.
-        axis: The axis to apply the function along (0 or 1).
-        arr: The 2D array to apply the function to.
-
-    Returns:
-        A 1D array with the results of applying the function along the specified axis.
-    """
-    assert arr.ndim == 2
-    assert axis in [0, 1]
-    if axis == 0:
-        result = np.empty(arr.shape[1])
-        for i in range(len(result)):
-            result[i] = func1d(arr[:, i])
-    else:
-        result = np.empty(arr.shape[0])
-        for i in range(len(result)):
-            result[i] = func1d(arr[i, :])
-
-    return result
-
-
-@nb.njit(cache=True, fastmath=True)
 def np_mean(array, axis):
     """
-    Computes the mean of a 2D array along a specified axis.
-
-    Args:
-        array: The 2D array to compute the mean for.
-        axis: The axis to compute the mean along (0 or 1).
-
-    Returns:
-        A scalar value representing the mean of the input array.
+    Compute mean of a 2D array along axis 0 or 1.
+    Returns a 1D array of means for the other axis.
     """
-    return np_apply_along_axis(np.mean, axis, array)
-
-
-@nb.njit(cache=True, fastmath=True)
-def np_std(array, axis):
-    """
-    Computes the standard deviation of a 2D array along a specified axis.
-
-    Args:
-        array: The 2D array to compute the standard deviation for.
-        axis: The axis to compute the standard deviation along (0 or 1).
-
-    Returns:
-        A scalar value representing the standard deviation of the input array.
-    """
-    return np_apply_along_axis(np.std, axis, array)
+    assert array.ndim == 2
+    assert axis in (0, 1)
+    if axis == 0:
+        out = np.empty(array.shape[1], dtype=np.double)
+        n = array.shape[0]
+        for j in range(array.shape[1]):
+            s = 0.0
+            for i in range(n):
+                s += array[i, j]
+            out[j] = s / n
+        return out
+    else:
+        out = np.empty(array.shape[0], dtype=np.double)
+        n = array.shape[1]
+        for i in range(array.shape[0]):
+            s = 0.0
+            for j in range(n):
+                s += array[i, j]
+            out[i] = s / n
+        return out
 
 
 @nb.njit(cache=True, fastmath=True)
 def np_var(array, axis):
     """
-    Computes the variance of a 2D array along a specified axis.
-
-    Args:
-        array: The 2D array to compute the variance for.
-        axis: The axis to compute the variance along (0 or 1).
-
-    Returns:
-        A scalar value representing the variance of the input array.
+    Compute variance of a 2D array along axis 0 or 1.
     """
-    return np_apply_along_axis(np.var, axis, array)
+    assert array.ndim == 2
+    assert axis in (0, 1)
+    if axis == 0:
+        mean = np_mean(array, 0)
+        out = np.empty(array.shape[1], dtype=np.double)
+        n = array.shape[0]
+        for j in range(array.shape[1]):
+            s = 0.0
+            m = mean[j]
+            for i in range(n):
+                d = array[i, j] - m
+                s += d * d
+            out[j] = s / n
+        return out
+    else:
+        mean = np_mean(array, 1)
+        out = np.empty(array.shape[0], dtype=np.double)
+        n = array.shape[1]
+        for i in range(array.shape[0]):
+            s = 0.0
+            m = mean[i]
+            for j in range(n):
+                d = array[i, j] - m
+                s += d * d
+            out[i] = s / n
+        return out
+
+
+@nb.njit(cache=True, fastmath=True)
+def np_std(array, axis):
+    """
+    Compute standard deviation of a 2D array along axis 0 or 1.
+    """
+    v = np_var(array, axis)
+    out = np.empty(v.shape[0], dtype=np.double)
+    for i in range(v.shape[0]):
+        out[i] = np.sqrt(v[i])
+    return out
 
 
 @nb.njit(fastmath=True, cache=True)

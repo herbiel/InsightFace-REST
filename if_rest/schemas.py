@@ -100,3 +100,19 @@ class BodyDraw(BaseModel):
     detect_masks: Optional[bool] = pydantic.Field(default=settings.defaults.detect_masks,
                                                   example=settings.defaults.detect_masks,
                                                   description='Detect medical masks')
+
+
+class BodyCompare(BaseModel):
+    images: Images
+
+    threshold: Optional[float] = pydantic.Field(default=settings.defaults.det_thresh,
+                                                example=settings.defaults.det_thresh,
+                                                description='Detector threshold')
+
+    # Number of faces to consider per image; default 1 (take the top face)
+    face_index: Optional[int] = pydantic.Field(default=0,
+                                              example=0,
+                                              description='Which face index to use (0 = top/confident)')
+    metric: Optional[str] = pydantic.Field(default='cosine_norm',
+                                           example='cosine_norm',
+                                           description="Metric to return: 'cosine_norm' (0..1, default), 'cosine_raw' (-1..1), 'euclidean' (distance + score=1/(1+dist)'), 'euclidean_sim' (same as 'euclidean')")
